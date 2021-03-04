@@ -7,20 +7,23 @@ extern "C" {
 
 void chatterCallback(const std_msgs::String::ConstPtr& msg)
 {
-    lcd1602Clear();
-
     const std::string& message = msg->data;
     std::size_t crlf = message.find('\n');
 
     lcd1602SetCursor(0,0);
-
+    char line1[17], line2[17];
+    
     if (crlf != std::string::npos) { // two lines
-	lcd1602WriteString ((char*)message.substr(0, crlf).c_str());
-	lcd1602SetCursor(0,1);
-	lcd1602WriteString ((char*)message.substr(crlf+1, crlf+17).c_str());	
+	snprintf(line1, 17, "%-16s", message.substr(0, crlf).c_str());
+	snprintf(line2, 17, "%-16s", message.substr(crlf+1, crlf+17).c_str());	
     } else { // one line
-	lcd1602WriteString ((char*)message.substr(0,16).c_str());
+	snprintf(line1, 17, "%-16s", message.c_str());
+	snprintf(line2, 17, "                ");
     }
+
+    lcd1602WriteString (line1);
+    lcd1602SetCursor(0,1);
+    lcd1602WriteString (line2);
 }
 
 int main(int argc, char **argv)
